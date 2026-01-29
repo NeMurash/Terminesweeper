@@ -26,16 +26,20 @@ struct Cell {
 };
 
 void initTerminal();
-void quitTerminal();
-
+void resetTerminal();
 void moveCursor(int distance, int direction);
+void processMovement();
 
 struct termios oldTerminal, newTerminal;
+struct Cell cells[GRID_H][GRID_W];
+
+char c;
+int dx = 0;
+int dy = 0;
 
 int main(void) {
 	initTerminal();
 
-	struct Cell cells[GRID_H][GRID_W];
 	for (int y=0; y<GRID_H; y++) {
 		for (int x=0; x<GRID_W; x++) {
 			cells[y][x].glyph = GLYPH_FILL;
@@ -46,44 +50,12 @@ int main(void) {
 	}
 	moveCursor(GRID_H, DIR_UP);
 
-	char c;
-	int dx = 0;
-	int dy = 0;
-	while ((c = getchar()) != 'q') {
-		switch (c) {
-			case 'w':
-				moveCursor(1, DIR_UP);
-				dy++;
-				if (dy > 0) {
-					moveCursor(1, DIR_DOWN);
-					dy--;
-				}
-				break;
-			case 's':
-				moveCursor(1, DIR_DOWN);
-				dy--;
-				if (dy < -GRID_H+1) {
-					moveCursor(1, DIR_UP);
-					dy++;
-				}
-				break;
-			case 'a':
-				moveCursor(2, DIR_LEFT);
-				dx--;
-				break;
-			case 'd':
-				moveCursor(2, DIR_RIGHT);
-				dx++;
-				if (dx >= GRID_W) {
-					moveCursor(2, DIR_LEFT);
-					dx--;
-				}
-				break;
-			default: break;
-		}
+	while (c != 'q') {
+		c = getchar();
+		processMovement();
 	}
 
-	quitTerminal();
+	resetTerminal();
 
 	moveCursor(GRID_H + abs(dy), DIR_DOWN);
 
@@ -101,7 +73,7 @@ void initTerminal() {
 	tcsetattr(STDIN_FILENO, TCSANOW, &newTerminal);
 }
 
-void quitTerminal() {
+void resetTerminal() {
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldTerminal);
 }
 
@@ -119,5 +91,39 @@ void moveCursor(int distance, int direction) {
 		case DIR_RIGHT:
 			printf("\033[%dC", distance);
 			break;
+	}
+}
+
+void processMovement() {
+	switch (c) {
+		case 'w':
+			moveCursor(1, DIR_UP);
+			dy++;
+			if (dy > 0) {
+				moveCursor(1, DIR_DOWN);
+				dy--;
+			}
+			break;
+		case 's':
+			moveCursor(1, DIR_DOWN);
+			dy--;
+			if (dy < -GRID_H+1) {
+				moveCursor(1, DIR_UP);
+				dy++;
+			}
+			break;
+		case 'a':
+			moveCursor(2, DIR_LEFT);
+			dx--;
+			break;
+		case 'd':
+			moveCursor(2, DIR_RIGHT);
+			dx++;
+			if (dx >= GRID_W) {
+				moveCursor(2, DIR_LEFT);
+				dx--;
+			}
+			break;
+		default: break;
 	}
 }
