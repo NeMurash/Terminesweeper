@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <termios.h>
 
@@ -12,12 +13,22 @@ enum Glyphs {
 	GLYPH_NONE = ' ',
 };
 
+enum Directions {
+	DIR_UP,
+	DIR_DOWN,
+	DIR_LEFT,
+	DIR_RIGHT,
+};
+
 struct Cell {
 	char glyph;
+	bool bomb;
 };
 
 void initTerminal();
 void quitTerminal();
+
+void moveCursor(int distance, int direction);
 
 struct termios oldTerminal, newTerminal;
 
@@ -28,10 +39,12 @@ int main(void) {
 	for (int y=0; y<GRID_H; y++) {
 		for (int x=0; x<GRID_W; x++) {
 			cells[y][x].glyph = GLYPH_FILL;
+			cells[y][x].bomb = false;
 			printf("%c ", cells[y][x].glyph);
 		}
 		printf("\n");
 	}
+	moveCursor(GRID_H, DIR_UP);
 
 	char c;
 	int dx = 0;
@@ -39,26 +52,40 @@ int main(void) {
 	while ((c = getchar()) != 'q') {
 		switch (c) {
 			case 'w':
-				printf("\033[1A");
+				moveCursor(1, DIR_UP);
 				dy++;
+				if (dy > 0) {
+					moveCursor(1, DIR_DOWN);
+					dy--;
+				}
 				break;
 			case 's':
-				printf("\033[1B");
+				moveCursor(1, DIR_DOWN);
 				dy--;
-				break;
-			case 'd':
-				printf("\033[2C");
-				dx++;
+				if (dy < -GRID_H+1) {
+					moveCursor(1, DIR_UP);
+					dy++;
+				}
 				break;
 			case 'a':
-				printf("\033[2D");
+				moveCursor(2, DIR_LEFT);
 				dx--;
+				break;
+			case 'd':
+				moveCursor(2, DIR_RIGHT);
+				dx++;
+				if (dx >= GRID_W) {
+					moveCursor(2, DIR_LEFT);
+					dx--;
+				}
 				break;
 			default: break;
 		}
 	}
 
 	quitTerminal();
+
+	moveCursor(GRID_H + abs(dy), DIR_DOWN);
 
 	return 0;
 }
@@ -76,4 +103,21 @@ void initTerminal() {
 
 void quitTerminal() {
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldTerminal);
+}
+
+void moveCursor(int distance, int direction) {
+	switch (direction) {
+		case DIR_UP:
+			printf("\033[%dA", distance);
+			break;
+		case DIR_DOWN:
+			printf("\033[%dB", distance);
+			break;
+		case DIR_LEFT:
+			printf("\033[%dD", distance);
+			break;
+		case DIR_RIGHT:
+			printf("\033[%dC", distance);
+			break;
+	}
 }
