@@ -24,8 +24,8 @@ enum MovementKeys {
 };
 
 enum SpecialKeys {
-	KEY_QUIT   = 'q',
-	KEY_REVEAL = ' ',
+	KEY_QUIT   = '\033', // The octal representation of an ASCII escape character or whatever (TL;DR: escape key)
+	KEY_REVEAL = '\040', // Space key
 	KEY_FLAG   = 'f',
 };
 
@@ -38,8 +38,9 @@ enum CursorDirections {
 
 struct Cell {
 	char glyph;
-	bool revealed;
 	bool mine;
+	bool revealed;
+	bool flagged;
 };
 
 void initTerminal();
@@ -130,8 +131,9 @@ void initBoard() {
 	for (int y=0; y<GRID_H; y++) {
 		for (int x=0; x<GRID_W; x++) {
 			cells[y][x].glyph = GLYPH_FILL;
-			cells[y][x].revealed = false;
 			cells[y][x].mine     = false;
+			cells[y][x].revealed = false;
+			cells[y][x].flagged  = false;
 		}
 	}
 }
