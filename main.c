@@ -6,6 +6,7 @@
 
 #define GRID_W 16
 #define GRID_H 16
+
 #define N_MINES 10
 
 enum Glyphs {
@@ -40,7 +41,7 @@ struct Cell {
 	bool mine;
 	bool revealed;
 	bool flagged;
-	int mineNeighbours;
+	int  mineNeighbours;
 };
 
 void initTerminal();
