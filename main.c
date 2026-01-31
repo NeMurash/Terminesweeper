@@ -1,10 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 #include <termios.h>
 
 #define GRID_W 16
 #define GRID_H 16
+
+#define N_MINES 10
 
 enum Glyphs {
 	GLYPH_FILL = '#',
@@ -13,114 +16,164 @@ enum Glyphs {
 	GLYPH_NONE = ' ',
 };
 
-enum Directions {
-	DIR_UP,
-	DIR_DOWN,
-	DIR_LEFT,
-	DIR_RIGHT,
+enum MovementKeys {
+	MOVE_UP    = 'w',
+	MOVE_DOWN  = 's',
+	MOVE_LEFT  = 'a',
+	MOVE_RIGHT = 'd',
+};
+
+enum SpecialKeys {
+	KEY_QUIT   = 'q',
+	KEY_REVEAL = ' ',
+	KEY_FLAG   = 'f',
+};
+
+enum CursorDirections {
+	CUR_DIR_UP,
+	CUR_DIR_DOWN,
+	CUR_DIR_LEFT,
+	CUR_DIR_RIGHT,
 };
 
 struct Cell {
 	char glyph;
-	bool bomb;
+	bool revealed;
+	bool mine;
 };
 
 void initTerminal();
-void resetTerminal();
+void initBoard();
+void initBombs();
+void quitTerminal();
+void displayBoard();
 void moveCursor(int distance, int direction);
 void processMovement();
 
-struct termios oldTerminal, newTerminal;
+struct termios oldTerminalSettings, newTerminalSettings;
 struct Cell cells[GRID_H][GRID_W];
 
-char c;
+char input;
+
 int dx = 0;
 int dy = 0;
 
 int main(void) {
+	srand(time(0));
+
 	initTerminal();
+	initBoard();
+	initBombs();
 
-	for (int y=0; y<GRID_H; y++) {
-		for (int x=0; x<GRID_W; x++) {
-			cells[y][x].glyph = GLYPH_FILL;
-			cells[y][x].bomb = false;
-			printf("%c ", cells[y][x].glyph);
-		}
-		printf("\n");
-	}
-	moveCursor(GRID_H, DIR_UP);
+	displayBoard();
 
-	while (c != 'q') {
-		c = getchar();
+	while (input != KEY_QUIT) {
+		input = getchar();
 		processMovement();
 	}
 
-	resetTerminal();
+	quitTerminal();
 
-	moveCursor(GRID_H + abs(dy), DIR_DOWN);
+	moveCursor(GRID_H + abs(dy), CUR_DIR_DOWN);
 
 	return 0;
 }
 
 void initTerminal() {
-	tcgetattr(STDIN_FILENO, &oldTerminal);
+	tcgetattr(STDIN_FILENO, &oldTerminalSettings);
 
-	newTerminal = oldTerminal;
+	newTerminalSettings = oldTerminalSettings;
 
-	newTerminal.c_lflag &= ~(ICANON);
-	newTerminal.c_lflag &= ~(ECHO);
+	newTerminalSettings.c_lflag &= ~(ICANON);
+	newTerminalSettings.c_lflag &= ~(ECHO);
 
-	tcsetattr(STDIN_FILENO, TCSANOW, &newTerminal);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newTerminalSettings);
 }
 
-void resetTerminal() {
-	tcsetattr(STDIN_FILENO, TCSANOW, &oldTerminal);
+void initBoard() {
+	for (int y=0; y<GRID_H; y++) {
+		for (int x=0; x<GRID_W; x++) {
+			cells[y][x].glyph = GLYPH_FILL;
+			cells[y][x].revealed = false;
+			cells[y][x].mine     = false;
+		}
+	}
+}
+
+void initBombs() {
+	int i = N_MINES;
+	while (i >= 0) {
+		int x = rand() % (GRID_W + 1);
+		int y = rand() % (GRID_H + 1);
+
+		if (!cells[y][x].mine) {
+			cells[y][x].mine = true;
+			i--;
+		}
+	}
+}
+
+void quitTerminal() {
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldTerminalSettings);
+}
+
+void displayBoard() {
+	for (int y=0; y<GRID_H; y++) {
+		for (int x=0; x<GRID_W; x++) {
+			printf("%c ", cells[y][x].glyph);
+		}
+		printf("\n");
+	}
+	moveCursor(GRID_H, CUR_DIR_UP);
 }
 
 void moveCursor(int distance, int direction) {
 	switch (direction) {
-		case DIR_UP:
+		case CUR_DIR_UP:
 			printf("\033[%dA", distance);
 			break;
-		case DIR_DOWN:
+		case CUR_DIR_DOWN:
 			printf("\033[%dB", distance);
 			break;
-		case DIR_LEFT:
+		case CUR_DIR_LEFT:
 			printf("\033[%dD", distance);
 			break;
-		case DIR_RIGHT:
+		case CUR_DIR_RIGHT:
 			printf("\033[%dC", distance);
 			break;
 	}
 }
 
 void processMovement() {
-	switch (c) {
-		case 'w':
-			moveCursor(1, DIR_UP);
+	switch (input) {
+		case MOVE_UP:
+			moveCursor(1, CUR_DIR_UP);
 			dy++;
 			if (dy > 0) {
-				moveCursor(1, DIR_DOWN);
+				moveCursor(1, CUR_DIR_DOWN);
 				dy--;
 			}
 			break;
-		case 's':
-			moveCursor(1, DIR_DOWN);
+		case MOVE_DOWN:
+			moveCursor(1, CUR_DIR_DOWN);
 			dy--;
 			if (dy < -GRID_H+1) {
-				moveCursor(1, DIR_UP);
+				moveCursor(1, CUR_DIR_UP);
 				dy++;
 			}
 			break;
-		case 'a':
-			moveCursor(2, DIR_LEFT);
+		case MOVE_LEFT:
+			moveCursor(2, CUR_DIR_LEFT);
 			dx--;
+			if (dx < 0) {
+				dx++;
+			}
 			break;
-		case 'd':
-			moveCursor(2, DIR_RIGHT);
+		case MOVE_RIGHT:
+			moveCursor(2, CUR_DIR_RIGHT);
 			dx++;
 			if (dx >= GRID_W) {
-				moveCursor(2, DIR_LEFT);
+				moveCursor(2, CUR_DIR_LEFT);
 				dx--;
 			}
 			break;
