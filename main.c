@@ -54,6 +54,7 @@ void revealCell(struct Cell *cell);
 void flagCell(struct Cell *cell);
 void resetCursor();
 void processMovement();
+int countCellMineNeighbours(int x, int y);
 
 struct termios oldTerminalSettings, newTerminalSettings;
 struct Cell cells[GRID_H][GRID_W];
@@ -194,9 +195,8 @@ void revealCell(struct Cell *cell) {
 		cell->revealed = true;
 		if (cell->mine)
 			cell->glyph = GLYPH_MINE;
-		else {
+		else
 			cell->glyph = GLYPH_NONE;
-		}
 	}
 }
 
@@ -256,4 +256,17 @@ void processMovement() {
 			break;
 		default: break;
 	}
+}
+
+int countCellMineNeighbours(int cellX, int cellY) {
+	int nbors = 0;
+
+	for (int y=cellY; y<cellY+2; y++) {
+		for (int x=cellX; x<cellX+2; x++) {
+			if (y == x) continue;
+			if (cells[y][x].mine) nbors++;
+		}
+	}
+
+	return nbors;
 }
