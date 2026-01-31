@@ -6,14 +6,13 @@
 
 #define GRID_W 16
 #define GRID_H 16
-
 #define N_MINES 10
 
 enum Glyphs {
 	GLYPH_FILL = '#',
 	GLYPH_MINE = 'X',
 	GLYPH_FLAG = 'F',
-	GLYPH_NONE = ' ', // Hey Jimmy, give me a character with NOTHING.
+	GLYPH_NONE = ' ',    // Hey Jimmy, give me a character with NOTHING.
 };
 
 enum MovementKeys {
@@ -25,7 +24,7 @@ enum MovementKeys {
 
 enum SpecialKeys {
 	KEY_QUIT   = '\033', // The octal representation of an ASCII escape character or whatever (TL;DR: escape key)
-	KEY_REVEAL = ' ', // Noooothinn?
+	KEY_REVEAL = ' ',    // Nuuthinn?? (space key)
 	KEY_FLAG   = 'f',
 };
 
@@ -41,14 +40,16 @@ struct Cell {
 	bool mine;
 	bool revealed;
 	bool flagged;
+	int mineNeighbours;
 };
 
 void initTerminal();
 void initBoard();
 void initBombs();
 void quitTerminal();
-void displayBoard();
+void updateBoard();
 void moveCursor(int distance, int direction);
+void resetCursor();
 void processMovement();
 
 struct termios oldTerminalSettings, newTerminalSettings;
@@ -65,6 +66,8 @@ char input;
 
 int dx = 0;
 int dy = 0;
+int tempX = 0;
+int tempY = 0;
 
 int main(void) {
 	srand(time(0));
@@ -73,18 +76,21 @@ int main(void) {
 	initBoard();
 	initBombs();
 
-	displayBoard();
+	updateBoard();
 
 	bool gameOver = false;
 	while (!gameOver) {
 		input = getchar();
 
+		processMovement();
+
 		switch (gameState) {
 			case STATE_CHOOSING:
-				processMovement();
-
 				switch (input) {
 					case KEY_REVEAL:
+
+						updateBoard();
+
 						gameState = STATE_REVEALED;
 						break;
 					case KEY_FLAG:
@@ -128,14 +134,15 @@ void initTerminal() {
 }
 
 void initBoard() {
-	for (int y=0; y<GRID_H; y++) {
-		for (int x=0; x<GRID_W; x++) {
-			cells[y][x].glyph = GLYPH_FILL;
-			cells[y][x].mine     = false;
-			cells[y][x].revealed = false;
-			cells[y][x].flagged  = false;
-		}
-	}
+	for (int y=0; y<GRID_H; y++)
+		for (int x=0; x<GRID_W; x++)
+			cells[y][x] = (struct Cell) {
+				GLYPH_FILL,
+				false,
+				false,
+				false,
+				0,
+			};
 }
 
 void initBombs() {
@@ -155,7 +162,11 @@ void quitTerminal() {
 	tcsetattr(STDIN_FILENO, TCSANOW, &oldTerminalSettings);
 }
 
-void displayBoard() {
+void updateBoard() {
+	tempX = dx;
+	tempY = dy;
+	resetCursor();
+
 	for (int y=0; y<GRID_H; y++) {
 		for (int x=0; x<GRID_W; x++) {
 			printf("%c ", cells[y][x].glyph);
@@ -163,6 +174,16 @@ void displayBoard() {
 		printf("\n");
 	}
 	moveCursor(GRID_H, CUR_DIR_UP);
+
+	// Restore the cursor position
+	if  (tempX != 0) {
+		moveCursor(abs(tempX) * 2, CUR_DIR_RIGHT);
+		dx = tempX;
+	}
+	if  (tempY != 0) {
+		moveCursor(abs(tempY), CUR_DIR_DOWN);
+		dy = tempY;
+	}
 }
 
 void moveCursor(int distance, int direction) {
@@ -179,6 +200,17 @@ void moveCursor(int distance, int direction) {
 		case CUR_DIR_RIGHT:
 			printf("\033[%dC", distance);
 			break;
+	}
+}
+
+void resetCursor() {
+	if (dx != 0) {
+		moveCursor(abs(dx)*2, CUR_DIR_LEFT);
+		dx = 0;
+	}
+	if (dy != 0) {
+		moveCursor(abs(dy), CUR_DIR_UP);
+		dy = 0;
 	}
 }
 
