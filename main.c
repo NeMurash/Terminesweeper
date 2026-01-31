@@ -53,6 +53,13 @@ void processMovement();
 struct termios oldTerminalSettings, newTerminalSettings;
 struct Cell cells[GRID_H][GRID_W];
 
+enum GameStates {
+	STATE_CHOOSING,
+	STATE_REVEALED,
+	STATE_FLAGGED,
+	STATE_LOST,
+} gameState = STATE_CHOOSING;
+
 char input;
 
 int dx = 0;
@@ -67,9 +74,38 @@ int main(void) {
 
 	displayBoard();
 
-	while (input != KEY_QUIT) {
+	bool gameOver = false;
+	while (!gameOver) {
 		input = getchar();
-		processMovement();
+
+		switch (gameState) {
+			case STATE_CHOOSING:
+				processMovement();
+
+				switch (input) {
+					case KEY_REVEAL:
+						gameState = STATE_REVEALED;
+						break;
+					case KEY_FLAG:
+						gameState = STATE_FLAGGED;
+						break;
+					case KEY_QUIT:
+						gameOver = true;
+						break;
+					default: break;
+				}
+				break;
+			case STATE_REVEALED:
+				gameState = STATE_CHOOSING;
+				break;
+			case STATE_FLAGGED:
+				gameState = STATE_CHOOSING;
+				break;
+			case STATE_LOST:
+				gameOver = true;
+				break;
+			default: break;
+		}
 	}
 
 	quitTerminal();
