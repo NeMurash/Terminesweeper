@@ -13,7 +13,7 @@ enum Glyphs {
 	GLYPH_FILL = '#',
 	GLYPH_MINE = 'X',
 	GLYPH_FLAG = 'F',
-	GLYPH_NONE = ' ',
+	GLYPH_NONE = ' ', // Hey Jimmy, give me a character with NOTHING.
 };
 
 enum MovementKeys {
@@ -25,7 +25,7 @@ enum MovementKeys {
 
 enum SpecialKeys {
 	KEY_QUIT   = '\033', // The octal representation of an ASCII escape character or whatever (TL;DR: escape key)
-	KEY_REVEAL = '\040', // Space key
+	KEY_REVEAL = ' ', // Noooothinn?
 	KEY_FLAG   = 'f',
 };
 
