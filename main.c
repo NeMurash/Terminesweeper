@@ -50,18 +50,13 @@ void initBombs();
 void quitTerminal();
 void updateBoard();
 void moveCursor(int distance, int direction);
+void revealCell(struct Cell *cell);
+void flagCell(struct Cell *cell);
 void resetCursor();
 void processMovement();
 
 struct termios oldTerminalSettings, newTerminalSettings;
 struct Cell cells[GRID_H][GRID_W];
-
-enum GameStates {
-	STATE_CHOOSING,
-	STATE_REVEALED,
-	STATE_FLAGGED,
-	STATE_LOST,
-} gameState = STATE_CHOOSING;
 
 char input;
 
@@ -85,31 +80,20 @@ int main(void) {
 
 		processMovement();
 
-		switch (gameState) {
-			case STATE_CHOOSING:
-				switch (input) {
-					case KEY_REVEAL:
+		switch (input) {
+			case KEY_REVEAL:
+				revealCell(&cells[abs(dy)][abs(dx)]);
 
-						updateBoard();
+				updateBoard();
 
-						gameState = STATE_REVEALED;
-						break;
-					case KEY_FLAG:
-						gameState = STATE_FLAGGED;
-						break;
-					case KEY_QUIT:
-						gameOver = true;
-						break;
-					default: break;
-				}
 				break;
-			case STATE_REVEALED:
-				gameState = STATE_CHOOSING;
+			case KEY_FLAG:
+				flagCell(&cells[abs(dy)][abs(dx)]);
+
+				updateBoard();
+
 				break;
-			case STATE_FLAGGED:
-				gameState = STATE_CHOOSING;
-				break;
-			case STATE_LOST:
+			case KEY_QUIT:
 				gameOver = true;
 				break;
 			default: break;
@@ -170,7 +154,8 @@ void updateBoard() {
 
 	for (int y=0; y<GRID_H; y++) {
 		for (int x=0; x<GRID_W; x++) {
-			printf("%c ", cells[y][x].glyph);
+			struct Cell *currentCell = &cells[y][x];
+			printf("%c ", currentCell->glyph);
 		}
 		printf("\n");
 	}
@@ -201,6 +186,27 @@ void moveCursor(int distance, int direction) {
 		case CUR_DIR_RIGHT:
 			printf("\033[%dC", distance);
 			break;
+	}
+}
+
+void revealCell(struct Cell *cell) {
+	if (!cell->revealed && !cell->flagged) {
+		cell->revealed = true;
+		if (cell->mine)
+			cell->glyph = GLYPH_MINE;
+		else {
+			cell->glyph = GLYPH_NONE;
+		}
+	}
+}
+
+void flagCell(struct Cell *cell) {
+	if (!cell->revealed) {
+		cell->flagged = !cell->flagged;
+		if (cell->flagged)
+			cell->glyph = GLYPH_FLAG;
+		else
+			cell->glyph = GLYPH_FILL;
 	}
 }
 
