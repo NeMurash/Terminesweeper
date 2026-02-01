@@ -41,7 +41,6 @@ struct Cell {
 	bool mine;
 	bool revealed;
 	bool flagged;
-	int  mineNeighbours;
 };
 
 void initTerminal();
@@ -50,10 +49,13 @@ void initBombs();
 void quitTerminal();
 void updateBoard();
 void moveCursor(int distance, int direction);
-void revealCell(struct Cell *cell);
+void revealCell(int x, int y);
 void flagCell(struct Cell *cell);
 void resetCursor();
 void processMovement();
+bool isAMine(int x, int y);
+bool isValidCell(int x, int y);
+bool gameWon();
 int countCellMineNeighbours(int x, int y);
 
 struct termios oldTerminalSettings, newTerminalSettings;
@@ -66,6 +68,11 @@ int dy = 0;
 int tempX = 0;
 int tempY = 0;
 
+int safeCellsCount = GRID_W * GRID_H - N_MINES;
+
+bool gameOver = false;
+bool gameLost = true;
+
 int main(void) {
 	srand(time(0));
 
@@ -75,7 +82,6 @@ int main(void) {
 
 	updateBoard();
 
-	bool gameOver = false;
 	while (!gameOver) {
 		input = getchar();
 
@@ -83,9 +89,11 @@ int main(void) {
 
 		switch (input) {
 			case KEY_REVEAL:
-				revealCell(&cells[abs(dy)][abs(dx)]);
+				revealCell(dx, dy);
 
 				updateBoard();
+
+				if (gameWon()) gameOver = true;
 
 				break;
 			case KEY_FLAG:
@@ -104,6 +112,13 @@ int main(void) {
 	quitTerminal();
 
 	moveCursor(GRID_H + abs(dy), CUR_DIR_DOWN);
+
+	printf("\r");
+
+	if (!gameLost)
+		printf("YOU WON!!!! BOOYAH!!!!!\n");
+	else
+		printf("You lost :((\n");
 
 	return 0;
 }
@@ -127,7 +142,6 @@ void initBoard() {
 				false,
 				false,
 				false,
-				0,
 			};
 }
 
@@ -190,13 +204,39 @@ void moveCursor(int distance, int direction) {
 	}
 }
 
-void revealCell(struct Cell *cell) {
-	if (!cell->revealed && !cell->flagged) {
-		cell->revealed = true;
-		if (cell->mine)
-			cell->glyph = GLYPH_MINE;
-		else
-			cell->glyph = GLYPH_NONE;
+// Oh my God bruh
+void revealCell(int x, int y) {
+	if (isValidCell(x, y)) {
+		struct Cell *cell = &cells[abs(y)][abs(x)];
+		if (!cell->revealed && !cell->flagged) {
+			cell->revealed = true;
+			if (cell->mine) {
+				cell->glyph = GLYPH_MINE;
+				for (int i=0; i<GRID_H; i++) {
+					for (int j=0; j<GRID_W; j++) {
+						if (cells[i][j].mine)
+							cells[i][j].glyph = GLYPH_MINE;
+					}
+				}
+				updateBoard();
+				gameOver = true;
+			}
+			else {
+				int mineNbors = countCellMineNeighbours(x, y);
+				if (mineNbors == 0) {
+					cell->glyph = GLYPH_NONE;
+					for (int ty=y-1; ty<y+2; ty++) {
+						for (int tx=x-1; tx<x+2; tx++) {
+							if (ty == tx) continue;
+							revealCell(tx, ty);
+						}
+					}
+				}
+				else 
+					cell->glyph = (char) ('0' + mineNbors);
+				safeCellsCount--;
+			}
+		}
 	}
 }
 
@@ -258,13 +298,37 @@ void processMovement() {
 	}
 }
 
+bool isAMine(int x, int y) {
+	if (isValidCell(x, y) && cells[abs(y)][abs(x)].mine)
+		return true;
+	return false;
+}
+
+bool isValidCell(int x, int y) {
+	if ((0 >= y && y > -GRID_H)&&(0 <= x && x < GRID_W))
+		return true;
+	return false;
+}
+
+bool gameWon() {
+	for (int i=0; i<GRID_H; i++) {
+		for (int j=0; j<GRID_W; j++) {
+			struct Cell *cell = &cells[i][j];
+			if (!cell->mine && !cell->revealed)
+				return false;
+		}
+	}
+	gameLost = false;
+	return true;
+}
+
 int countCellMineNeighbours(int cellX, int cellY) {
 	int nbors = 0;
 
-	for (int y=cellY; y<cellY+2; y++) {
-		for (int x=cellX; x<cellX+2; x++) {
+	for (int y=cellY-1; y<cellY+2; y++) {
+		for (int x=cellX-1; x<cellX+2; x++) {
 			if (y == x) continue;
-			if (cells[y][x].mine) nbors++;
+			if (isAMine(x, y)) nbors++;
 		}
 	}
 
