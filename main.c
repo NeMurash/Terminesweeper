@@ -332,8 +332,6 @@ void processMovement() {
 		case MOVE_DOWN:
 		case MOVE_LEFT:
 		case MOVE_RIGHT:
-			if (AUDIO_ON)
-				system("aplay -q sounds/blip4.wav &");
 			break;
 		default: break;
 	}
