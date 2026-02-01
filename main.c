@@ -4,6 +4,16 @@
 #include <time.h>
 #include <termios.h>
 
+#define COLOUR_RED     "\033[31m"
+#define COLOUR_BRED    "\033[91m"
+#define COLOUR_BBLUE   "\033[94m"
+#define COLOUR_BLUE    "\033[34m"
+#define COLOUR_GREEN   "\033[32m"
+#define COLOUR_CYAN    "\033[36m"
+#define COLOUR_YELLOW  "\033[33m"
+#define COLOUR_MAGENTA "\033[35m"
+#define COLOUR_CLEAR   "\033[39;49m"
+
 #define GRID_W 16
 #define GRID_H 16
 
@@ -170,7 +180,41 @@ void updateBoard() {
 	for (int y=0; y<GRID_H; y++) {
 		for (int x=0; x<GRID_W; x++) {
 			struct Cell *currentCell = &cells[y][x];
-			printf("%c ", currentCell->glyph);
+			switch (currentCell->glyph) {
+				case GLYPH_MINE:
+					printf(COLOUR_RED"%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+				case GLYPH_FLAG:
+					printf(COLOUR_RED"%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+				case '1':
+					printf(COLOUR_BBLUE"%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+				case '2':
+					printf(COLOUR_GREEN"%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+				case '3':
+					printf(COLOUR_BRED"%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+				case '4':
+					printf(COLOUR_BLUE"%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+				case '5':
+					printf(COLOUR_MAGENTA"%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+				case '6':
+					printf(COLOUR_CYAN"%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+				case '7':
+					printf(COLOUR_CYAN"%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+				case '8':
+					printf(COLOUR_CYAN"%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+				default:
+					printf("%c "COLOUR_CLEAR, currentCell->glyph);
+					break;
+			}
 		}
 		printf("\n");
 	}
