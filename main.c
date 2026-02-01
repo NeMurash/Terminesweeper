@@ -22,6 +22,8 @@
 
 #define N_MINES 20
 
+#define AUDIO_ON true
+
 enum Glyphs {
 	GLYPH_FILL = '#',
 	GLYPH_MINE = 'X',
@@ -104,7 +106,8 @@ int main(void) {
 
 				updateBoard();
 
-				system("aplay -q sounds/blip3.wav &");
+				if (AUDIO_ON)
+					system("aplay -q sounds/blip3.wav &");
 
 				if (gameWon()) {
 					for (int i=0; i<GRID_H; i++) {
@@ -138,11 +141,13 @@ int main(void) {
 	printf("\r");
 
 	if (!gameLost) {
-		system("aplay -q sounds/win.wav &");
+		if (AUDIO_ON)
+			system("aplay -q sounds/win.wav &");
 		printf("YOU WON!!!! BOOYAH!!!!\n");
 	}
 	else {
-		system("aplay -q sounds/boom.wav &");
+		if (AUDIO_ON)
+			system("aplay -q sounds/boom.wav &");
 		printf("You lost :((\n");
 	}
 
@@ -301,7 +306,8 @@ void revealCell(int x, int y) {
 void flagCell(struct Cell *cell) {
 	if (!cell->revealed) {
 		cell->flagged = !cell->flagged;
-		system("aplay -q sounds/blip2.wav &");
+		if (AUDIO_ON)
+			system("aplay -q sounds/blip2.wav &");
 		if (cell->flagged)
 			cell->glyph = GLYPH_FLAG;
 		else
@@ -326,7 +332,8 @@ void processMovement() {
 		case MOVE_DOWN:
 		case MOVE_LEFT:
 		case MOVE_RIGHT:
-			system("aplay -q sounds/blip4.wav &");
+			if (AUDIO_ON)
+				system("aplay -q sounds/blip4.wav &");
 			break;
 		default: break;
 	}
