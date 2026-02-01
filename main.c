@@ -136,7 +136,7 @@ int main(void) {
 	printf("\r");
 
 	if (!gameLost)
-		printf("YOU WON!!!! BOOYAH!!!!!\n");
+		printf("YOU WON!!!! BOOYAH!!!!\n");
 	else
 		printf("You lost :((\n");
 
@@ -281,7 +281,6 @@ void revealCell(int x, int y) {
 					cell->glyph = GLYPH_NONE;
 					for (int ty=y-1; ty<y+2; ty++) {
 						for (int tx=x-1; tx<x+2; tx++) {
-							if (ty == tx) continue;
 							revealCell(tx, ty);
 						}
 					}
