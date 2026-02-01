@@ -104,6 +104,8 @@ int main(void) {
 
 				updateBoard();
 
+				system("aplay -q sounds/blip3.wav &");
+
 				if (gameWon()) {
 					for (int i=0; i<GRID_H; i++) {
 						for (int j=0; j<GRID_W; j++) {
@@ -135,10 +137,14 @@ int main(void) {
 
 	printf("\r");
 
-	if (!gameLost)
+	if (!gameLost) {
+		system("aplay -q sounds/win.wav &");
 		printf("YOU WON!!!! BOOYAH!!!!\n");
-	else
+	}
+	else {
+		system("aplay -q sounds/boom.wav &");
 		printf("You lost :((\n");
+	}
 
 	return 0;
 }
@@ -295,6 +301,7 @@ void revealCell(int x, int y) {
 void flagCell(struct Cell *cell) {
 	if (!cell->revealed) {
 		cell->flagged = !cell->flagged;
+		system("aplay -q sounds/blip2.wav &");
 		if (cell->flagged)
 			cell->glyph = GLYPH_FLAG;
 		else
@@ -314,6 +321,15 @@ void resetCursor() {
 }
 
 void processMovement() {
+	switch (input) {
+		case MOVE_UP:
+		case MOVE_DOWN:
+		case MOVE_LEFT:
+		case MOVE_RIGHT:
+			system("aplay -q sounds/blip4.wav &");
+			break;
+		default: break;
+	}
 	switch (input) {
 		case MOVE_UP:
 			moveCursor(1, CUR_DIR_UP);
