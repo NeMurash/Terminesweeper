@@ -17,7 +17,7 @@
 #define GRID_W 16
 #define GRID_H 16
 
-#define N_MINES 10
+#define N_MINES 16
 
 enum Glyphs {
 	GLYPH_FILL = '#',
@@ -77,8 +77,6 @@ int dx = 0;
 int dy = 0;
 int tempX = 0;
 int tempY = 0;
-
-int safeCellsCount = GRID_W * GRID_H - N_MINES;
 
 bool gameOver = false;
 bool gameLost = true;
@@ -197,7 +195,7 @@ void updateBoard() {
 					printf(COLOUR_BRED"%c "COLOUR_CLEAR, currentCell->glyph);
 					break;
 				case '4':
-					printf(COLOUR_BLUE"%c "COLOUR_CLEAR, currentCell->glyph);
+					printf(COLOUR_CYAN"%c "COLOUR_CLEAR, currentCell->glyph);
 					break;
 				case '5':
 					printf(COLOUR_MAGENTA"%c "COLOUR_CLEAR, currentCell->glyph);
@@ -278,7 +276,6 @@ void revealCell(int x, int y) {
 				}
 				else 
 					cell->glyph = (char) ('0' + mineNbors);
-				safeCellsCount--;
 			}
 		}
 	}
