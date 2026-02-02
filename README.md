@@ -63,7 +63,7 @@ With audio enabled (which is disabled by default), holding down a key that resul
 
 ## Fin
 
-The only testing I've done outside of my main machine was on Termux (The Linux Terminal Emulator for Android) where it worked like a charm after installing the needed dependencies like `alsa-utils` (for `aplay`), the GCC compiler, make, git (to clone) and whatever else. Just putting that out there.
+The only testing I've done outside of my main machine was on Termux (The Linux Terminal Emulator for Android) where it worked like a charm after installing the needed dependencies like `alsa-utils` (for aplay), `GCC`, `make`, `git` (to clone) and whatever else. Just putting that out there.
 
 The sounds were created with the [BFXR](https://www.bfxr.net/) tool.
 
