@@ -18,7 +18,7 @@ If you are sure a mine is under an unrevealed tile, you can flag/unflag that til
 
 ## Controls
 
-- `W, A, S, D` -> Navitagion.
+- `W, A, S, D` -> Navigation.
 - `SPACE` -> Reveal a tile.
 - `F` -> Flag a tile.
 
