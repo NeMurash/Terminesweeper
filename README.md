@@ -57,6 +57,10 @@ There's also the colour definitions there which are just [escape codes](https://
 
 Below the definitions you can find enums for some keybinds but I'm sure you can figure out how to change them if you happen to want to do that. You're so smart.
 
+## Warnings
+
+With audio enabled (which is disabled by default), holding down a key that results in playing a sound spikes my CPU usage to 100% on several cores so there MIGHT be something wrong with the way I'm handling playing sounds. ^_^
+
 ## Fin
 
 I've done no testing outside of my own machine. Fun!
