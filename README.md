@@ -57,4 +57,4 @@ I've done no testing outside of my own machine. Fun!
 
 Here have a gif of the gameplay, as a treat.
 
-[game](/misc/example.gif)
+![game](/misc/example.gif)
