@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
@@ -22,7 +23,8 @@
 
 #define N_MINES 20
 
-#define AUDIO_ON true
+#define ENABLE_AUDIO   false
+#define ENABLE_COLOURS true
 
 enum Glyphs {
 	GLYPH_FILL = '#',
@@ -106,7 +108,7 @@ int main(void) {
 
 				updateBoard();
 
-				if (AUDIO_ON)
+				if (ENABLE_AUDIO)
 					system("aplay -q sounds/blip3.wav &");
 
 				if (gameWon()) {
@@ -141,12 +143,12 @@ int main(void) {
 	printf("\r");
 
 	if (!gameLost) {
-		if (AUDIO_ON)
+		if (ENABLE_AUDIO)
 			system("aplay -q sounds/win.wav &");
 		printf("YOU WON!!!! BOOYAH!!!!\n");
 	}
 	else {
-		if (AUDIO_ON)
+		if (ENABLE_AUDIO)
 			system("aplay -q sounds/boom.wav &");
 		printf("You lost :((\n");
 	}
@@ -201,40 +203,45 @@ void updateBoard() {
 	for (int y=0; y<GRID_H; y++) {
 		for (int x=0; x<GRID_W; x++) {
 			struct Cell *currentCell = &cells[y][x];
-			switch (currentCell->glyph) {
-				case GLYPH_MINE:
-					printf(COLOUR_RED"%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
-				case GLYPH_FLAG:
-					printf(COLOUR_RED"%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
-				case '1':
-					printf(COLOUR_CYAN"%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
-				case '2':
-					printf(COLOUR_GREEN"%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
-				case '3':
-					printf(COLOUR_BRED"%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
-				case '4':
-					printf(COLOUR_BLUE"%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
-				case '5':
-					printf(COLOUR_YELLOW"%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
-				case '6':
-					printf(COLOUR_BCYAN"%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
-				case '7':
-					printf(COLOUR_GRAY"%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
-				case '8':
-					printf(COLOUR_WHITE"%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
-				default:
-					printf("%c "COLOUR_CLEAR, currentCell->glyph);
-					break;
+			if (ENABLE_COLOURS) {
+				switch (currentCell->glyph) {
+					case GLYPH_MINE:
+						printf(COLOUR_RED"%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+					case GLYPH_FLAG:
+						printf(COLOUR_RED"%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+					case '1':
+						printf(COLOUR_CYAN"%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+					case '2':
+						printf(COLOUR_GREEN"%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+					case '3':
+						printf(COLOUR_BRED"%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+					case '4':
+						printf(COLOUR_BLUE"%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+					case '5':
+						printf(COLOUR_YELLOW"%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+					case '6':
+						printf(COLOUR_BCYAN"%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+					case '7':
+						printf(COLOUR_GRAY"%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+					case '8':
+						printf(COLOUR_WHITE"%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+					default:
+						printf("%c "COLOUR_CLEAR, currentCell->glyph);
+						break;
+				}
+			}
+			else {
+				printf("%c ", currentCell->glyph);
 			}
 		}
 		printf("\n");
@@ -306,7 +313,7 @@ void revealCell(int x, int y) {
 void flagCell(struct Cell *cell) {
 	if (!cell->revealed) {
 		cell->flagged = !cell->flagged;
-		if (AUDIO_ON)
+		if (ENABLE_AUDIO)
 			system("aplay -q sounds/blip2.wav &");
 		if (cell->flagged)
 			cell->glyph = GLYPH_FLAG;
