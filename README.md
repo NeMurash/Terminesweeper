@@ -10,11 +10,17 @@ I'm sure the way Minesweeper is played is widely known at this point but it woul
 
 You are presented with a grid of tiles under which could either be a mine or nothing. Your goal is to reveal every tile that is not a mine.
 
-To start, navigate to a random tile with the **W, A, S, D** keys and hit **SPACE** to reveal it, if the tile was a mine, tough luck, if it was not, the tile, upon getting revealed, will then represent the number of mines adjacent to it (vertically, horizontally and diagonally) with a number (or it will display nothing if there are no mines around).
+To start, navigate to a random tile with the `W, A, S, D` keys and hit `SPACE` to reveal it, if the tile was a mine, tough luck, if it was not, the tile, upon getting revealed, will then represent the number of mines adjacent to it (vertically, horizontally and diagonally) with a number (or it will display nothing if there are no mines around).
 
 Using logic you will have to figure out where mines are located and try not to reveal them to win the game.
 
-If you are sure a mine is under an unrevealed tile, you can flag/unflag that tile with the **F** key which will prevent that tile from getting revealed by accident.
+If you are sure a mine is under an unrevealed tile, you can flag/unflag that tile with the `F` key which will prevent that tile from getting revealed by accident.
+
+## Controls
+
+- `W, A, S, D` -> Navitagion.
+- `SPACE` -> Reveal a tile.
+- `F` -> Flag a tile.
 
 ## Building / Compiling
 
@@ -30,7 +36,7 @@ If you're not using Linux. I'm sorry but, at least for now, you're on your own h
 
 ## Dependencies
 
-If the "ENABLE_AUDIO" option has been enabled in the [main.c](/main.c) file, you'll need to have the [aplay](https://linux.die.net/man/1/aplay) utility installed.
+If the `ENABLE_AUDIO` option has been enabled in the [main.c](/main.c) file, you'll need to have the [aplay](https://linux.die.net/man/1/aplay) utility installed.
 
 As far as I know that's the only problem you might encounter when building the thing.
 
@@ -39,13 +45,13 @@ As far as I know that's the only problem you might encounter when building the t
 In the [main.c](/main.c) file there's a bunch of definitions that you can change at your leisure, some of them are:
 
 These should be integers:
-- GRID_W -> The width of the game grid.
-- GRID_H -> The height of the game grid.
-- N_MINES -> The number of mines that will be present on the game grid. (The number might be off by one, I forgot to count)
+- `GRID_W` -> The width of the game grid.
+- `GRID_H` -> The height of the game grid.
+- `N_MINES` -> The number of mines that will be present on the game grid. (The number might be off by one, I forgot to count)
 
 These can be either true or false:
-- ENABLE_AUDIO -> self explanatory.
-- ENABLE_COLOURS -> Same here.
+- `ENABLE_AUDIO` -> self explanatory.
+- `ENABLE_COLOURS` -> Same here.
 
 There's also the colour definitions there which are just [escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors) that get printed to the terminal and set the colour.
 
