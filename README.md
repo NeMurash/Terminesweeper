@@ -55,6 +55,6 @@ Below the definitions you can find enums for some keybinds but I'm sure you can 
 
 I've done no testing outside of my own machine. Fun!
 
-Here have a gif of the gameplay, as a treat.
+Here have an image of the gameplay, as a treat.
 
-![game](/misc/example.gif)
+![game](/misc/example.png)
