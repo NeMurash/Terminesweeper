@@ -44,18 +44,18 @@ As far as I know that's the only problem you might encounter when building the t
 
 In the [main.c](/main.c) file there's a bunch of definitions that you can change at your leisure, some of them are:
 
-These should be integers:
+1. These must be positive integers:
 - `GRID_W` -> The width of the game grid.
 - `GRID_H` -> The height of the game grid.
 - `N_MINES` -> The number of mines that will be present on the game grid. (The number might be off by one, I forgot to count)
 
-These can be either true or false:
-- `ENABLE_AUDIO` -> self explanatory.
+2. These must be either true or false:
+- `ENABLE_AUDIO` -> Self explanatory.
 - `ENABLE_COLOURS` -> Same here.
 
-There's also the colour definitions there which are just [escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors) that get printed to the terminal and set the colour.
+3. There's also the colour definitions there which are just [escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors) that get printed to the terminal and set the colour.
 
-Below the definitions you can find enums for some keybinds but I'm sure you can figure out how to change them if you happen to want to do that. You're so smart.
+4. Below the definitions you can find enums for some keybinds but I'm sure you can figure out how to change them if you happen to want to do that. You're so smart.
 
 ## Warnings
 
@@ -63,7 +63,7 @@ With audio enabled (which is disabled by default), holding down a key that resul
 
 ## Fin
 
-I've done no testing outside of my own machine. Fun!
+The only testing I've done outside of my main machine was on Termux (The Linux Terminal Emulator for Android) where it worked like a charm after installing the needed dependencies like `alsa-utils` (for `aplay`), the GCC compiler, make, git (to clone) and whatever else. Just putting that out there.
 
 The sounds were created with the [BFXR](https://www.bfxr.net/) tool.
 
