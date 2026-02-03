@@ -319,7 +319,7 @@ void areaRevealCell(int x, int y) {
 		struct Cell *cell = &cells[abs(y)][abs(x)];
 		if (cell->revealed) {
 			int flagNbors = countCellFlaggedNeighbours(x, y);
-			if (flagNbors == atoi(&cell->glyph)) {
+			if (flagNbors >= atoi(&cell->glyph)) {
 				for (int ty=y-1; ty<y+2; ty++) {
 					for (int tx=x-1; tx<x+2; tx++) {
 						revealCell(tx, ty);

@@ -22,6 +22,8 @@ If you are sure a mine is under an unrevealed tile, you can flag/unflag that til
 - `SPACE` -> Reveal a tile.
 - `F` -> Flag a tile.
 
+- Pressing `SPACE` on a tile that has been revealed will automatically reveal all the tiles around it if there are as many or more flags around it as the number the tile represents.
+
 ## Building / Compiling
 
 This project makes use of the GCC compiler and the "Make" standart UNIX utility through the [Makefile](/Makefile) for an easier time when compiling the project.
