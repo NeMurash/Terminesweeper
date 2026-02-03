@@ -67,13 +67,16 @@ void quitTerminal();
 void updateBoard();
 void moveCursor(int distance, int direction);
 void revealCell(int x, int y);
+void areaRevealCell(int x, int y);
 void flagCell(struct Cell *cell);
 void resetCursor();
 void processMovement();
 bool isAMine(int x, int y);
+bool isAFlag(int x, int y);
 bool isValidCell(int x, int y);
 bool gameWon();
 int countCellMineNeighbours(int x, int y);
+int countCellFlaggedNeighbours(int x, int y);
 
 struct termios oldTerminalSettings, newTerminalSettings;
 struct Cell cells[GRID_H][GRID_W];
@@ -104,6 +107,7 @@ int main(void) {
 
 		switch (input) {
 			case KEY_REVEAL:
+				areaRevealCell(dx, dy);
 				revealCell(dx, dy);
 
 				updateBoard();
@@ -310,6 +314,22 @@ void revealCell(int x, int y) {
 	}
 }
 
+void areaRevealCell(int x, int y) {
+	if (isValidCell(x, y)) {
+		struct Cell *cell = &cells[abs(y)][abs(x)];
+		if (cell->revealed) {
+			int flagNbors = countCellFlaggedNeighbours(x, y);
+			if (flagNbors == atoi(&cell->glyph)) {
+				for (int ty=y-1; ty<y+2; ty++) {
+					for (int tx=x-1; tx<x+2; tx++) {
+						revealCell(tx, ty);
+					}
+				}
+			}
+		}
+	}
+}
+
 void flagCell(struct Cell *cell) {
 	if (!cell->revealed) {
 		cell->flagged = !cell->flagged;
@@ -384,6 +404,12 @@ bool isAMine(int x, int y) {
 	return false;
 }
 
+bool isAFlag(int x, int y) {
+	if (isValidCell(x, y) && cells[abs(y)][abs(x)].flagged)
+		return true;
+	return false;
+}
+
 bool isValidCell(int x, int y) {
 	if ((0 >= y && y > -GRID_H)&&(0 <= x && x < GRID_W))
 		return true;
@@ -409,6 +435,19 @@ int countCellMineNeighbours(int cellX, int cellY) {
 		for (int x=cellX-1; x<cellX+2; x++) {
 			if (y == x) continue;
 			if (isAMine(x, y)) nbors++;
+		}
+	}
+
+	return nbors;
+}
+
+int countCellFlaggedNeighbours(int cellX, int cellY) {
+	int nbors = 0;
+
+	for (int y=cellY-1; y<cellY+2; y++) {
+		for (int x=cellX-1; x<cellX+2; x++) {
+			if (y == x) continue;
+			if (isAFlag(x, y)) nbors++;
 		}
 	}
 
