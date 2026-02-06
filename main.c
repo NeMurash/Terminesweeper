@@ -62,7 +62,7 @@ struct Cell {
 
 void initTerminal();
 void initBoard();
-void initBombs();
+void initMines();
 void quitTerminal();
 void updateBoard();
 void moveCursor(int distance, int direction);
@@ -96,7 +96,7 @@ int main(void) {
 
 	initTerminal();
 	initBoard();
-	initBombs();
+	initMines();
 
 	updateBoard();
 
@@ -182,7 +182,7 @@ void initBoard() {
 			};
 }
 
-void initBombs() {
+void initMines() {
 	int i = N_MINES;
 	while (i >= 0) {
 		int x = rand() % (GRID_W + 1);
