@@ -356,14 +356,6 @@ void resetCursor() {
 void processMovement() {
 	switch (input) {
 		case MOVE_UP:
-		case MOVE_DOWN:
-		case MOVE_LEFT:
-		case MOVE_RIGHT:
-			break;
-		default: break;
-	}
-	switch (input) {
-		case MOVE_UP:
 			moveCursor(1, CUR_DIR_UP);
 			dy++;
 			if (dy > 0) {
