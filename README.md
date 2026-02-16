@@ -72,3 +72,7 @@ The sounds were created with the [BFXR](https://www.bfxr.net/) tool.
 Here have an image of the gameplay, as a treat.
 
 ![game](/misc/example.png)
+
+## Note
+
+I just found out ncurses exists, I should've probably used that...
